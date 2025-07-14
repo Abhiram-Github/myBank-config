@@ -4,7 +4,7 @@ build:
 accounts:
   message : "Welcome to accounts API for Lab env"
   contactDetails :
-    name : "Abhiram"
+    name : "Abhiram The Rise"
     email : "abhiramcontacts999@gmail.com"
   onCallSupport :
     - (555) 555-1234
