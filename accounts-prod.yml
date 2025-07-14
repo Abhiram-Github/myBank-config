@@ -5,7 +5,7 @@ accounts:
   message : "Welcome to accounts API for prod env"
   contactDetails :
     name : "Abhiram"
-    email : "abhiram@gmail.com"
+    email : "123abhiramdammala@gmail.com"
   onCallSupport :
     - (555) 555-1234
     - (555) 524-1245
