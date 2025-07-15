@@ -1,0 +1,96 @@
+Spring Cloud Config Server pulls configuration files from a GitHub repo.
+
+Accounts microservice consumes configuration from that config server using the Spring Cloud Config Client.
+
+AppConfig class bounds to a custom configuration (accounts) using @ConfigurationProperties.
+
+How It Works - Step by Step
+
+1. Config Server Setup
+Your configserver microservice does the following:
+    a. Clones your config repo on startup.
+    
+    b. Serves configs over HTTP via endpoints like:
+        http://configserver:8071/accounts/default
+        http://configserver:8071/loans/prod
+    
+So any microservice can query configs using its app name and profile.
+
+2. Accounts Microservice Configuration
+Your application.yml in the accounts service has:
+        spring:
+          config:
+            import: "optional:configserver:http://localhost:8071/"
+          profiles:
+            active: "prod"
+This tells Spring:
+“Import configs from the remote config server.”
+Load files like accounts-prod.yml or accounts.yml from GitHub (served by configserver).
+
+
+3. Config Binding with @ConfigurationProperties
+
+You have this POJO:
+
+@ConfigurationProperties(prefix = "accounts")
+@Data
+public class AppConfig {
+    private String message;
+    private Map<String, String> contactDetails;
+    private List<String> onCallSupport;
+}
+
+And in your main class:
+
+@EnableConfigurationProperties({AppConfig.class})
+@SpringBootApplication
+public class AccountsApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(AccountsApplication.class, args);
+    }
+}
+
+This means:
+
+Spring looks for all config properties starting with "accounts"
+It automatically maps them into the AppConfig object
+
+The values come from:
+First: application.yml of the app (if present)
+Then: Spring Config Server’s fetched accounts.yml or accounts-prod.yml
+
+
+4. What Happens on Startup?
+
+
+accounts starts up.
+
+It sees spring.config.import = configserver:http://localhost:8071/
+
+It calls:
+GET http://configserver:8071/accounts/prod
+                                   
+Config server reads accounts-prod.yml from GitHub and returns it.
+
+Spring merges those configs into the Environment.
+
+AppConfig gets populated automatically via @ConfigurationProperties.
+
+
+
+Summary
+                                   
+Component	Role
+                                   
+Config Server	                 - Clones GitHub repo and exposes config files over HTTP
+Accounts Service               - Fetches config from config server on startup
+AppConfig	                     - Binds accounts.* properties into a Java POJO automatically
+application.yml	               - Tells the app to use configserver: for loading external config
+@EnableConfigurationProperties -  Registers the class for Spring to bind values into it
+
+
+
+
+
+
+
